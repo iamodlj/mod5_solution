@@ -22,7 +22,6 @@ var menuItemsUrl =
   "https://coursera-jhu-default-rtdb.firebaseio.com/menu_items/";
 var menuItemsTitleHtml = "snippets/menu-items-title.html";
 var menuItemHtml = "snippets/menu-item.html";
-
 // Convenience function for inserting innerHTML for 'select'
 var insertHtml = function (selector, html) {
   var targetElem = document.querySelector(selector);
@@ -63,35 +62,35 @@ var switchMenuToActive = function () {
 // On page load (before images or CSS)
 document.addEventListener("DOMContentLoaded", function (event) {
 
-// TODO: STEP 0: Look over the code from
-// *** start ***
-// to
-// *** finish ***
-// below.
-// We changed this code to retrieve all categories from the server instead of
-// simply requesting home HTML snippet. We now also have another function
-// called buildAndShowHomeHTML that will receive all the categories from the server
-// and process them: choose random category, retrieve home HTML snippet, insert that
-// random category into the home HTML snippet, and then insert that snippet into our
-// main page (index.html).
-//
-// TODO: STEP 1: Substitute [...] below with the *value* of the function buildAndShowHomeHTML,
-// so it can be called when server responds with the categories data.
+  // TODO: STEP 0: Look over the code from
+  // *** start ***
+  // to
+  // *** finish ***
+  // below.
+  // We changed this code to retrieve all categories from the server instead of
+  // simply requesting home HTML snippet. We now also have another function
+  // called buildAndShowHomeHTML that will receive all the categories from the server
+  // and process them: choose random category, retrieve home HTML snippet, insert that
+  // random category into the home HTML snippet, and then insert that snippet into our
+  // main page (index.html).
+  //
+  // TODO: STEP 1: Substitute [...] below with the *value* of the function buildAndShowHomeHTML,
+  // so it can be called when server responds with the categories data.
 
-// *** start ***
-// On first load, show home view
-showLoading("#main-content");
-$ajaxUtils.sendGetRequest(
-  allCategoriesUrl,
-  [...], // ***** <---- TODO: STEP 1: Substitute [...] ******
-  true); // Explicitly setting the flag to get JSON from server processed into an object literal
+  // *** start ***
+  // On first load, show home view
+  showLoading("#main-content");
+  $ajaxUtils.sendGetRequest(
+    allCategoriesUrl,
+    buildAndShowHomeHTML, // ***** <---- TODO: STEP 1: Substitute [...] ******
+    true); // Explicitly setting the flag to get JSON from server processed into an object literal
+  // *** finish **
+
 });
-// *** finish **
-
 
 // Builds HTML for the home page based on categories array
 // returned from the server.
-function buildAndShowHomeHTML (categories) {
+function buildAndShowHomeHTML(categories) {
 
   // Load home snippet page
   $ajaxUtils.sendGetRequest(
@@ -101,8 +100,8 @@ function buildAndShowHomeHTML (categories) {
       // TODO: STEP 2: Here, call chooseRandomCategory, passing it retrieved 'categories'
       // Pay attention to what type of data that function returns vs what the chosenCategoryShortName
       // variable's name implies it expects.
-      // var chosenCategoryShortName = ....
-
+      var chosenCategory = chooseRandomCategory(categories);
+      var chosenCategoryShortName = chosenCategory.short_name;
 
       // TODO: STEP 3: Substitute {{randomCategoryShortName}} in the home html snippet with the
       // chosen category from STEP 2. Use existing insertProperty function for that purpose.
@@ -114,29 +113,25 @@ function buildAndShowHomeHTML (categories) {
       // $dc.loadMenuItems('L')
       // Hint: you need to surround the chosen category short name with something before inserting
       // it into the home html snippet.
-      //
-      // var homeHtmlToInsertIntoMainPage = ....
-
+      var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, "randomCategoryShortName", "'" + chosenCategoryShortName + "'");
 
       // TODO: STEP 4: Insert the produced HTML in STEP 3 into the main page
       // Use the existing insertHtml function for that purpose. Look through this code for an example
       // of how to do that.
-      // ....
+      insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
 
     },
     false); // False here because we are getting just regular HTML from the server, so no need to process JSON.
 }
 
-
 // Given array of category objects, returns a random category object.
-function chooseRandomCategory (categories) {
+function chooseRandomCategory(categories) {
   // Choose a random index into the array (from 0 inclusively until array length (exclusively))
   var randomArrayIndex = Math.floor(Math.random() * categories.length);
 
   // return category object with that randomArrayIndex
   return categories[randomArrayIndex];
 }
-
 
 // Load the menu categories view
 dc.loadMenuCategories = function () {
@@ -145,7 +140,6 @@ dc.loadMenuCategories = function () {
     allCategoriesUrl,
     buildAndShowCategoriesHTML);
 };
-
 
 // Load the menu items view
 // 'categoryShort' is a short_name for a category
@@ -156,10 +150,9 @@ dc.loadMenuItems = function (categoryShort) {
     buildAndShowMenuItemsHTML);
 };
 
-
 // Builds HTML for the categories page based on the data
 // from the server
-function buildAndShowCategoriesHTML (categories) {
+function buildAndShowCategoriesHTML(categories) {
   // Load title snippet of categories page
   $ajaxUtils.sendGetRequest(
     categoriesTitleHtml,
@@ -181,7 +174,6 @@ function buildAndShowCategoriesHTML (categories) {
     },
     false);
 }
-
 
 // Using categories data and snippets html
 // build categories view HTML to be inserted into page
@@ -211,8 +203,6 @@ function buildCategoriesViewHtml(categories,
   return finalHtml;
 }
 
-
-
 // Builds HTML for the single category page based on the data
 // from the server
 function buildAndShowMenuItemsHTML (categoryMenuItems) {
@@ -237,7 +227,6 @@ function buildAndShowMenuItemsHTML (categoryMenuItems) {
     },
     false);
 }
-
 
 // Using category and menu items data and snippets html
 // build menu items view HTML to be inserted into page
@@ -270,21 +259,21 @@ function buildMenuItemsViewHtml(categoryMenuItems,
                      "catShortName",
                      catShortName);
     html =
-      insertItemPrice(html,
-                      "price_small",
-                      menuItems[i].price_small);
+      insertProperty(html,
+                     "price_small",
+                     menuItems[i].price_small);
     html =
-      insertItemPortionName(html,
-                            "small_portion_name",
-                            menuItems[i].small_portion_name);
+      insertProperty(html,
+                     "small_portion_name",
+                     menuItems[i].small_portion_name);
     html =
-      insertItemPrice(html,
-                      "price_large",
-                      menuItems[i].price_large);
+      insertProperty(html,
+                     "price_large",
+                     menuItems[i].price_large);
     html =
-      insertItemPortionName(html,
-                            "large_portion_name",
-                            menuItems[i].large_portion_name);
+      insertProperty(html,
+                     "large_portion_name",
+                     menuItems[i].large_portion_name);
     html =
       insertProperty(html,
                      "name",
@@ -305,36 +294,6 @@ function buildMenuItemsViewHtml(categoryMenuItems,
 
   finalHtml += "</section>";
   return finalHtml;
-}
-
-
-// Appends price with '$' if price exists
-function insertItemPrice(html,
-                         pricePropName,
-                         priceValue) {
-  // If not specified, replace with empty string
-  if (!priceValue) {
-    return insertProperty(html, pricePropName, "");
-  }
-
-  priceValue = "$" + priceValue.toFixed(2);
-  html = insertProperty(html, pricePropName, priceValue);
-  return html;
-}
-
-
-// Appends portion name in parens if it exists
-function insertItemPortionName(html,
-                               portionPropName,
-                               portionValue) {
-  // If not specified, return original string
-  if (!portionValue) {
-    return insertProperty(html, portionPropName, "");
-  }
-
-  portionValue = "(" + portionValue + ")";
-  html = insertProperty(html, portionPropName, portionValue);
-  return html;
 }
 
 
